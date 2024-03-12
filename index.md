@@ -214,7 +214,7 @@ hide: true
 
 </script>
 
-## CSSE Home Page -Derek Kang
+## CSSE 1-2 Home Page -Derek Kang
 Welcome to my blog page.
 <body>
     <div>
