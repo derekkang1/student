@@ -68,6 +68,7 @@ hide: true
       this.pixels = {{pixels}}; //pixel offset of images in the sprite, set by liquid constant
       this.interval = 100; //animation time interval
       this.obj = meta_data;
+      this.direction = "right";
       this.marioElement.style.position = "absolute";
     }
 
@@ -93,12 +94,20 @@ hide: true
 
     startWalking() {
       this.stopAnimate();
-      this.animate(this.obj["Walk"], 3);
+      if(this.direction == "right"){
+        this.animate(this.obj["Walk"], 3);
+      }else if(this.direction == "left"){
+        this.animate(this.obj["WalkL"], -3);
+      }
     }
 
     startRunning() {
       this.stopAnimate();
-      this.animate(this.obj["Run1"], 6);
+      if(this.direction == "right"){
+        this.animate(this.obj["Run1"], 6);
+      }else if(this.direction == "left"){
+        this.animate(this.obj["Run1L"], -6);
+      }
     }
 
     startPuffing() {
@@ -108,7 +117,13 @@ hide: true
 
     startCheering() {
       this.stopAnimate();
-      this.animate(this.obj["Cheer"], 0);
+      if(this.direction == "right"){
+        this.animate(this.obj["Cheer"], 0);
+      }else if(this.direction == "left"){
+        this.animate(this.obj["CheerL"], 0);
+      }
+
+      
     }
 
     startFlipping() {
@@ -137,17 +152,27 @@ hide: true
         mario.startCheering();
       } else {
         if (mario.currentSpeed === 0) {
+          mario.direction = "right";
           mario.startWalking();
         } else if (mario.currentSpeed === 3) {
           mario.startRunning();
+        } else if (mario.currentSpeed === 6) {
+          mario.startResting();
         }
       }
     } else if (event.key === "ArrowLeft") {
       event.preventDefault();
       if (event.repeat) {
-        mario.stopAnimate();
+        mario.startCheering();
       } else {
-        mario.startPuffing();
+        if (mario.currentSpeed === 0) {
+          mario.direction = "left";
+          mario.startWalking();
+        } else if (mario.currentSpeed === -3) {
+          mario.startRunning();
+        } else if (mario.currentSpeed === -6) {
+          mario.startResting();
+        }
       }
     }
   });
@@ -188,12 +213,144 @@ hide: true
   });
 
 </script>
-Investing in Your Technical Future
 
-Explore the Computer Science Pathway at Del Norte High School. All Del Norte CompSci classes are designed to provide a real-world development experience. Grading is focused on time invested, analytics, participation with peers, and engagement in learning.
+## CSSE Home Page -Derek Kang
+Welcome to my blog page.
+<body>
+    <div>
+        <canvas id="spriteContainer">
+            <img id="box" src="{{site.baseurl}}/images/box.png"> 
+        </canvas>
+    </div>
+</body>
 
-- Project-based learning with teacher support
-- Tech Talks by teacher complimented with Student Teaching
-- Course learning includes Coding Languages, DevOps, GitHub, Research and Creativity
-- Student teams practice Agile Development Methodologies: planning, communication, collaboration
-- Class lab time provided and approximately 2-3 hours of homework per week
+<script>
+
+    window.addEventListener('load', function () {
+        const canvas = document.getElementById('spriteContainer');
+        const ctx = canvas.getContext('2d');
+        const SPRITE_WIDTH = 71.75;
+        const SPRITE_HEIGHT = 82.5;
+        const SCALE_FACTOR = 2;
+        const DESIRED_FRAME_RATE = 15;
+        const FRAME_INTERVAL = 1000 / DESIRED_FRAME_RATE;
+        canvas.width = SPRITE_WIDTH * SCALE_FACTOR * 7;
+        canvas.height = SPRITE_HEIGHT * SCALE_FACTOR;
+
+        class Box {
+            constructor() {
+                this.image = document.getElementById("box");
+                this.spriteWidth = SPRITE_WIDTH;
+                this.spriteHeight = SPRITE_HEIGHT;
+                this.width = this.spriteWidth;
+                this.height = this.spriteHeight;
+                this.x = 0;
+                this.y = 0;
+                this.scale = SCALE_FACTOR;
+                this.minFrame = 0;
+                this.frameY = 0;
+                this.frameX = 0;
+                this.maxFrame = 7;
+                this.speed = 10; 
+            }
+            setFrameLimit(limit) {
+                this.maxFrame = limit;
+            }
+            setPosition(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            draw(context) {
+                context.drawImage(
+                    this.image,
+                    this.frameX * this.spriteWidth,
+                    this.frameY * this.spriteHeight,
+                    this.spriteWidth,
+                    this.spriteHeight,
+                    this.x,
+                    this.y,
+                    this.width * this.scale,
+                    this.height * this.scale
+                );
+            }
+            update() {
+                if (this.frameX < this.maxFrame) {
+                    this.frameX++;
+                } else {
+                    this.frameX = 0;
+                }
+            }
+        }
+
+        const box = new Box();
+
+        const keyState = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            ArrowUp: false,
+        };
+
+        document.addEventListener('keydown', function (event) {
+            switch (event.key) {
+                case 'a':
+                    keyState.ArrowLeft = true;
+                    break;
+                case 'd':
+                    keyState.ArrowRight = true;
+                    break;
+                case 'w':
+                    keyState.ArrowUp = true;
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', function (event) {
+            switch (event.key) {
+                case 'a':
+                    keyState.ArrowLeft = false;
+                    break;
+                case 'd':
+                    keyState.ArrowRight = false;
+                    break;
+                case 'w':
+                    keyState.ArrowUp = false;
+                    break;
+            }
+        });
+
+        function updateAnimations() {
+            let selectedAnimation = 'A';
+            box.frameY = 0;
+            if (keyState.ArrowLeft) {
+                box.x -= box.speed;
+            }
+            if (keyState.ArrowRight) {
+                box.x += box.speed;
+            }
+            if (keyState.ArrowUp) {
+                selectedAnimation = 'B';
+                box.frameY = 1;
+            } 
+        }
+
+        let lastTimestamp = 0;
+        function animate(timestamp) {
+            const deltaTime = timestamp - lastTimestamp;
+            if (deltaTime >= FRAME_INTERVAL) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                box.draw(ctx);
+                box.update();
+                updateAnimations();
+                lastTimestamp = timestamp;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    });
+</script>
+
+## About Me
+Hi, I'm Derek Kang. I'm currently 14 years old and a freshmen at DNHS, Class of 2027. My academic interests are math and science, particularly physics and chemistry. In my free time I like to play Brawl Stars and hang out with my friends. My hobbies include playing violin, playing tennis, biking, snowboarding, and robotics. I can speak chinese, as well as english. My favorite food is pasta.
+
+<img src="{{site.baseurl}}/images/Untitled presentation.png">
