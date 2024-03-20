@@ -96,6 +96,48 @@ export class Player extends Character {
             }
         }
     }
+    snowmanCollision() {
+        if (this.timer === false) {
+            this.timer = true;
+            if (GameEnv.difficulty === "normal" || GameEnv.difficulty === "hard") {
+                this.canvas.style.transition = "transform 0.5s";
+                this.canvas.style.transform = "rotate(-90deg) translate(-26px, 0%)";
+                GameEnv.playSound("PlayerDeath");
+
+                if (this.isDying == false) {
+                    this.isDying = true;
+                    setTimeout(async() => {
+                        await GameControl.transitionToLevel(GameEnv.levels[GameEnv.levels.indexOf(GameEnv.currentLevel)]);
+                        console.log("level restart")
+                        this.isDying = false;
+                    }, 900); 
+                }
+            } else if (GameEnv.difficulty === "easy") {
+                this.x += 10;
+            }
+        }
+    }
+    owlCollision() {
+        if (this.timer === false) {
+            this.timer = true;
+            if (GameEnv.difficulty === "normal" || GameEnv.difficulty === "hard") {
+                this.canvas.style.transition = "transform 0.5s";
+                this.canvas.style.transform = "rotate(-90deg) translate(-26px, 0%)";
+                GameEnv.playSound("PlayerDeath");
+
+                if (this.isDying == false) {
+                    this.isDying = true;
+                    setTimeout(async() => {
+                        await GameControl.transitionToLevel(GameEnv.levels[GameEnv.levels.indexOf(GameEnv.currentLevel)]);
+                        console.log("level restart")
+                        this.isDying = false;
+                    }, 900); 
+                }
+            } else if (GameEnv.difficulty === "easy") {
+                this.x += 10;
+            }
+        }
+    }
     /**
      * This helper method that acts like an animation manager. Frames are set according to player events.
      *  - Sets the animation of the player based on the provided key.
